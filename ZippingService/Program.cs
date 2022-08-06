@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace ZippingService
 
         public static void Main(string[] args)
         {
+            Stopwatch sw = Stopwatch.StartNew();
             HashSet<int> years = new HashSet<int>();
             string[] zipFolders = Directory.GetDirectories(SourceFoldersLocation);
             foreach (var zipFolder in zipFolders)
@@ -34,11 +36,11 @@ namespace ZippingService
 
             foreach (var archive in years.Select(year => $"{SourceFoldersLocation}{year}"))
             {
-                Console.WriteLine($"Start creating new zip file: {archive}...");
+                Console.WriteLine($"{sw.Elapsed} | Compressing folder: {archive}...");
                 ZipFile.CreateFromDirectory(archive, $"{archive}.zip");
-                Console.WriteLine($"New zip file: {archive}.zip created.");
+                Console.WriteLine($"{sw.Elapsed} | New zip file: {archive}.zip created.");
             }
-            
+            Console.WriteLine($"{sw.Elapsed} | Done!");
             Console.ReadLine();
         }
     }
