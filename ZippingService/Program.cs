@@ -7,7 +7,10 @@ using System.Linq;
 namespace ZippingService
 {
     /// <summary>
-    /// 
+    /// Iterate though all 1st level folders in source-folder-location
+    /// Get year from folder's last write time, create folder with this year and move all similar folders into this folder
+    /// Compress all newly created folders
+    /// Only skip folders created in current year
     /// </summary>
     internal class Program
     {
