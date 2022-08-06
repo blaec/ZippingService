@@ -1,0 +1,6 @@
+C:\Users\blaec\Documents\csharpProjects\ZippingService\ZippingService\bin\Debug\ZippingService.exe
+C:\Users\blaec\Documents\csharpProjects\ZippingService\ZippingService\bin\Debug\ZippingService.pdb
+C:\Users\blaec\Documents\csharpProjects\ZippingService\ZippingService\obj\Debug\ZippingService.csprojAssemblyReference.cache
+C:\Users\blaec\Documents\csharpProjects\ZippingService\ZippingService\obj\Debug\ZippingService.csproj.CoreCompileInputs.cache
+C:\Users\blaec\Documents\csharpProjects\ZippingService\ZippingService\obj\Debug\ZippingService.exe
+C:\Users\blaec\Documents\csharpProjects\ZippingService\ZippingService\obj\Debug\ZippingService.pdb
