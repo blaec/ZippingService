@@ -15,33 +15,53 @@ namespace ZippingService
     /// </summary>
     internal class Program
     {
-        private const string SourceFoldersLocation = @"C:\Users\blaec\Downloads\old\";
+        private const bool IsZipFolders = false;
+        private const string SourceLocation = @"C:\Users\blaec\Downloads\old\";
         private static readonly int CurrentYear = DateTime.Today.Year;
+        private static readonly int NoZipPeriodInDays = 180;
 
         public static void Main(string[] args)
         {
-            Stopwatch sw = Stopwatch.StartNew();
+            var stopwatch = IsZipFolders 
+                ? ZipFolders() 
+                : ZipFiles();
+            Console.WriteLine($"{stopwatch.Elapsed} | Done!");
+            Console.ReadLine();
+        }
+
+        private static Stopwatch ZipFolders()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
             HashSet<int> years = new HashSet<int>();
-            string[] zipFolders = Directory.GetDirectories(SourceFoldersLocation);
+            string[] zipFolders = Directory.GetDirectories(SourceLocation);
             foreach (var zipFolder in zipFolders)
             {
                 var year = Directory.GetLastWriteTime(zipFolder).Year;
                 if (CurrentYear == year) continue;
-                
+
                 years.Add(year);
-                var destination = $"{SourceFoldersLocation}{year}{Path.DirectorySeparatorChar}";
+                var destination = $"{SourceLocation}{year}{Path.DirectorySeparatorChar}";
                 Directory.CreateDirectory(destination);
                 Directory.Move(zipFolder, $"{destination}{Path.GetFileName(zipFolder)}");
             }
 
-            foreach (var archive in years.Select(year => $"{SourceFoldersLocation}{year}"))
+            foreach (var archive in years.Select(year => $"{SourceLocation}{year}"))
             {
-                Console.WriteLine($"{sw.Elapsed} | Compressing folder: {archive}...");
+                Console.WriteLine($"{stopwatch.Elapsed} | Compressing folder: {archive}...");
                 ZipFile.CreateFromDirectory(archive, $"{archive}.zip");
-                Console.WriteLine($"{sw.Elapsed} | New zip file: {archive}.zip created.");
+                Console.WriteLine($"{stopwatch.Elapsed} | New zip file: {archive}.zip created.");
             }
-            Console.WriteLine($"{sw.Elapsed} | Done!");
-            Console.ReadLine();
+
+            return stopwatch;
         }
+
+        private static Stopwatch ZipFiles()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            // string[] zipFiles = Directory.GetDirectories(SourceLocation);
+
+            return stopwatch;
+        }
+        
     }
 }
