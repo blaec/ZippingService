@@ -70,13 +70,39 @@ namespace ZippingService
                 {
                     string tempFileLocation = $"{tempFolder}{Path.GetFileName(zipFile)}";
                     File.Move(zipFile, tempFileLocation);
-                    ZipFile.CreateFromDirectory(tempFolder, $"{zipFile}.zip");
-                    File.Move(tempFileLocation, $"{afterZipFolder}{Path.GetFileName(zipFile)}");
-                    Console.WriteLine($"{stopwatch.Elapsed} | New zip file: {zipFile}.zip created.");
+                    if (TryZip(tempFolder, zipFile))
+                    {
+                        File.Move(tempFileLocation, $"{afterZipFolder}{Path.GetFileName(zipFile)}");
+                    }
+                    else
+                    {
+                        File.Move(tempFileLocation, $"{SourceLocation}{Path.GetFileName(zipFile)}");
+                        Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! Failed to zip file: {zipFile}");
+                    }
+
+                    if (IsDirectoryEmpty(new DirectoryInfo(tempFileLocation)))
+                    {
+                        throw new IOException($"failed to revert change for file: {zipFile}");
+                    }
                 }
             }
             RemoveTempFolder(tempFolder, stopwatch);
             return stopwatch;
+        }
+
+        private static bool TryZip(string tempFolder, string zipFile)
+        {
+            bool isSuccess = true;
+            try
+            {
+                ZipFile.CreateFromDirectory(tempFolder, $"{zipFile}.zip");
+            }
+            catch (Exception e)
+            {
+                isSuccess = false;
+            }
+
+            return isSuccess;
         }
 
         private static void RemoveTempFolder(string tempFolder, Stopwatch stopwatch)
