@@ -58,38 +58,47 @@ namespace ZippingService
         private static Stopwatch ZipFiles()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            string[] zipFiles = Directory.GetFiles(SourceLocation, "*.log", SearchOption.TopDirectoryOnly);
             DateTime now = DateTime.Now;
-            string toDelete = $"{SourceLocation}zippedFiles{Path.DirectorySeparatorChar}";
-            Directory.CreateDirectory(toDelete);
-            string temp = $"{SourceLocation}temp{Path.DirectorySeparatorChar}";
-            Directory.CreateDirectory(temp);
+            var afterZipFolder = Directory.CreateDirectory($"{SourceLocation}zippedFiles{Path.DirectorySeparatorChar}").FullName;
+            var tempFolder = Directory.CreateDirectory($"{SourceLocation}temp{Path.DirectorySeparatorChar}").FullName;
+
+            string[] zipFiles = Directory.GetFiles(SourceLocation, "*.log", SearchOption.TopDirectoryOnly);
             foreach (string zipFile in zipFiles)
             {
-                FileInfo file = new FileInfo("zipFile");
-                bool isShouldZip = (now - file.LastWriteTime).TotalDays > NoZipPeriodInDays;
-                if (isShouldZip)
+                
+                if (ShouldZip(zipFile, now))
                 {
-                    string tempFileLocation = $"{temp}{Path.GetFileName(zipFile)}";
+                    string tempFileLocation = $"{tempFolder}{Path.GetFileName(zipFile)}";
                     File.Move(zipFile, tempFileLocation);
-                    ZipFile.CreateFromDirectory(temp, $"{zipFile}.zip");
-                    File.Move(tempFileLocation, $"{toDelete}{Path.GetFileName(zipFile)}");
+                    ZipFile.CreateFromDirectory(tempFolder, $"{zipFile}.zip");
+                    File.Move(tempFileLocation, $"{afterZipFolder}{Path.GetFileName(zipFile)}");
                     Console.WriteLine($"{stopwatch.Elapsed} | New zip file: {zipFile}.zip created.");
                 }
             }
-            if (IsDirectoryEmpty(new DirectoryInfo(temp)))
+            RemoveTempFolder(tempFolder, stopwatch);
+            return stopwatch;
+        }
+
+        private static void RemoveTempFolder(string tempFolder, Stopwatch stopwatch)
+        {
+            if (IsDirectoryEmpty(new DirectoryInfo(tempFolder)))
             {
-                Directory.Delete(temp);
+                Directory.Delete(tempFolder);
                 Console.WriteLine($"{stopwatch.Elapsed} | Temp folder removed.");
             }
             else
             {
-                Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! check temp folder {temp}");
+                Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! check temp folder {tempFolder}");
             }
-            return stopwatch;
+        }
+
+        private static bool ShouldZip(string zipFile, DateTime now)
+        {
+            FileInfo file = new FileInfo(zipFile);
+            return (now - file.LastWriteTime).TotalDays > NoZipPeriodInDays;
         }
         
-        public static bool IsDirectoryEmpty(DirectoryInfo directory)
+        private static bool IsDirectoryEmpty(DirectoryInfo directory)
         {
             FileInfo[] files = directory.GetFiles();
             DirectoryInfo[] subdirs = directory.GetDirectories();
