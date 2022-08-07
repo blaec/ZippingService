@@ -58,8 +58,24 @@ namespace ZippingService
         private static Stopwatch ZipFiles()
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-            // string[] zipFiles = Directory.GetDirectories(SourceLocation);
-
+            string[] zipFiles = Directory.GetFiles(SourceLocation, "*.log", SearchOption.TopDirectoryOnly);
+            DateTime now = DateTime.Now;
+            string toDelete = $"{SourceLocation}zippedFiles{Path.DirectorySeparatorChar}";
+            Directory.CreateDirectory(toDelete);
+            foreach (string zipFile in zipFiles)
+            {
+                FileInfo file = new FileInfo("zipFile");
+                bool isShouldZip = (now - file.LastWriteTime).TotalDays > NoZipPeriodInDays;
+                if (isShouldZip)
+                {
+                    string temp = $"{SourceLocation}temp{Path.DirectorySeparatorChar}";
+                    Directory.CreateDirectory(temp);
+                    string tempFileLocation = $"{temp}{Path.GetFileName(zipFile)}";
+                    File.Move(zipFile, tempFileLocation);
+                    ZipFile.CreateFromDirectory(temp, $"{zipFile}.zip");
+                    File.Move(tempFileLocation, $"{toDelete}{Path.GetFileName(zipFile)}");
+                }
+            }
             return stopwatch;
         }
         
