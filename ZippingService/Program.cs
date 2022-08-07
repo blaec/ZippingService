@@ -62,22 +62,39 @@ namespace ZippingService
             DateTime now = DateTime.Now;
             string toDelete = $"{SourceLocation}zippedFiles{Path.DirectorySeparatorChar}";
             Directory.CreateDirectory(toDelete);
+            string temp = $"{SourceLocation}temp{Path.DirectorySeparatorChar}";
+            Directory.CreateDirectory(temp);
             foreach (string zipFile in zipFiles)
             {
                 FileInfo file = new FileInfo("zipFile");
                 bool isShouldZip = (now - file.LastWriteTime).TotalDays > NoZipPeriodInDays;
                 if (isShouldZip)
                 {
-                    string temp = $"{SourceLocation}temp{Path.DirectorySeparatorChar}";
-                    Directory.CreateDirectory(temp);
                     string tempFileLocation = $"{temp}{Path.GetFileName(zipFile)}";
                     File.Move(zipFile, tempFileLocation);
                     ZipFile.CreateFromDirectory(temp, $"{zipFile}.zip");
                     File.Move(tempFileLocation, $"{toDelete}{Path.GetFileName(zipFile)}");
+                    Console.WriteLine($"{stopwatch.Elapsed} | New zip file: {zipFile}.zip created.");
                 }
+            }
+            if (IsDirectoryEmpty(new DirectoryInfo(temp)))
+            {
+                Directory.Delete(temp);
+                Console.WriteLine($"{stopwatch.Elapsed} | Temp folder removed.");
+            }
+            else
+            {
+                Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! check temp folder {temp}");
             }
             return stopwatch;
         }
         
+        public static bool IsDirectoryEmpty(DirectoryInfo directory)
+        {
+            FileInfo[] files = directory.GetFiles();
+            DirectoryInfo[] subdirs = directory.GetDirectories();
+
+            return (files.Length == 0 && subdirs.Length == 0);
+        }
     }
 }
