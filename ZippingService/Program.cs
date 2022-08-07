@@ -18,7 +18,7 @@ namespace ZippingService
         private const bool IsZipFolders = false;
         private const string SourceLocation = @"C:\Users\blaec\Downloads\old\";
         private static readonly int CurrentYear = DateTime.Today.Year;
-        private const int NoZipPeriodInDays = 180;
+        private const int NoZipPeriodInDays = 30;
 
         public static void Main(string[] args)
         {
@@ -68,19 +68,21 @@ namespace ZippingService
                 
                 if (ShouldZip(zipFile, now))
                 {
-                    string tempFileLocation = $"{tempFolder}{Path.GetFileName(zipFile)}";
+                    string zipFileName = Path.GetFileName(zipFile);
+                    string tempFileLocation = $"{tempFolder}{zipFileName}";
                     File.Move(zipFile, tempFileLocation);
                     if (TryZip(tempFolder, zipFile))
                     {
-                        File.Move(tempFileLocation, $"{afterZipFolder}{Path.GetFileName(zipFile)}");
+                        File.Move(tempFileLocation, $"{afterZipFolder}{zipFileName}");
                     }
                     else
                     {
-                        File.Move(tempFileLocation, $"{SourceLocation}{Path.GetFileName(zipFile)}");
                         Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! Failed to zip file: {zipFile}");
+                        File.Move(tempFileLocation, $"{SourceLocation}{zipFileName}");
+                        Console.WriteLine($"{stopwatch.Elapsed} | INFO !!! Failed zip file returned to source: {zipFile}");
                     }
 
-                    if (IsDirectoryEmpty(new DirectoryInfo(tempFileLocation)))
+                    if (!IsDirectoryEmpty(new DirectoryInfo(tempFileLocation)))
                     {
                         throw new IOException($"failed to revert change for file: {zipFile}");
                     }
