@@ -18,7 +18,7 @@ namespace ZippingService
         private const bool IsZipFolders = false;
         private const string SourceLocation = @"C:\Users\blaec\Downloads\old\";
         private static readonly int CurrentYear = DateTime.Today.Year;
-        private static readonly int NoZipPeriodInDays = 180;
+        private const int NoZipPeriodInDays = 180;
 
         public static void Main(string[] args)
         {
