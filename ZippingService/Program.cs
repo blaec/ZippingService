@@ -16,9 +16,9 @@ namespace ZippingService
     internal class Program
     {
         private const bool IsZipFolders = false;
-        private const string SourceLocation = @"C:\Users\blaec\Downloads\old\";
+        private const string SourceLocation = @"C:\runtime\httpd-2.4-x64\logs\";
         private static readonly int CurrentYear = DateTime.Today.Year;
-        private const int NoZipPeriodInDays = 30;
+        private const int NoZipPeriodInDays = 180;
 
         public static void Main(string[] args)
         {
@@ -61,6 +61,7 @@ namespace ZippingService
             DateTime now = DateTime.Now;
             var afterZipFolder = Directory.CreateDirectory($"{SourceLocation}zippedFiles{Path.DirectorySeparatorChar}").FullName;
             var tempFolder = Directory.CreateDirectory($"{SourceLocation}temp{Path.DirectorySeparatorChar}").FullName;
+            DirectoryInfo tempDirInfo = new DirectoryInfo(tempFolder);
 
             string[] zipFiles = Directory.GetFiles(SourceLocation, "*.log", SearchOption.TopDirectoryOnly);
             foreach (string zipFile in zipFiles)
@@ -70,21 +71,30 @@ namespace ZippingService
                 {
                     string zipFileName = Path.GetFileName(zipFile);
                     string tempFileLocation = $"{tempFolder}{zipFileName}";
+                    // Console.WriteLine($"{stopwatch.Elapsed} | DEBUG !!! Moving file: {zipFile} to temp dir: {tempFileLocation}");
                     File.Move(zipFile, tempFileLocation);
-                    if (TryZip(tempFolder, zipFile))
+                    if (!IsDirectoryEmpty(tempDirInfo))
                     {
-                        File.Move(tempFileLocation, $"{afterZipFolder}{zipFileName}");
+                        // Console.WriteLine($"{stopwatch.Elapsed} | DEBUG !!! Start compressing file: {zipFile}");
+                        if (TryZip(tempFolder, zipFile))
+                        {
+                            File.Move(tempFileLocation, $"{afterZipFolder}{zipFileName}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! Failed to zip file: {zipFile}");
+                            File.Move(tempFileLocation, $"{SourceLocation}{zipFileName}");
+                            Console.WriteLine($"{stopwatch.Elapsed} | INFO !!! Failed zip file returned to source: {zipFile}");
+                        }
+
+                        if (!IsDirectoryEmpty(tempDirInfo))
+                        {
+                            throw new IOException($"failed to revert change for file: {zipFile}");
+                        }
                     }
                     else
                     {
-                        Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! Failed to zip file: {zipFile}");
-                        File.Move(tempFileLocation, $"{SourceLocation}{zipFileName}");
-                        Console.WriteLine($"{stopwatch.Elapsed} | INFO !!! Failed zip file returned to source: {zipFile}");
-                    }
-
-                    if (!IsDirectoryEmpty(new DirectoryInfo(tempFileLocation)))
-                    {
-                        throw new IOException($"failed to revert change for file: {zipFile}");
+                        Console.WriteLine($"{stopwatch.Elapsed} | WARN !!! Skip to zip file: {zipFile}");
                     }
                 }
             }
@@ -99,7 +109,7 @@ namespace ZippingService
             {
                 ZipFile.CreateFromDirectory(tempFolder, $"{zipFile}.zip");
             }
-            catch (Exception e)
+           catch (Exception ignore)
             {
                 isSuccess = false;
             }
