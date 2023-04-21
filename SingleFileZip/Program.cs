@@ -54,7 +54,7 @@ namespace SingleFileZip
                 {
                     ArchiveFile(zipFile);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Console.WriteLine( $"{_stopwatch.Elapsed} | WARN !!! Failed zipping file returned to source: {zipFile}");
                 }
@@ -107,7 +107,7 @@ namespace SingleFileZip
             {
                 ZipFile.CreateFromDirectory(_tempFolder, $"{zipFile}.zip");
             }
-            catch (Exception ignore)
+            catch (Exception)
             {
                 isSuccess = false;
             }
