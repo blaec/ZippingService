@@ -6,10 +6,11 @@ using System.IO.Compression;
 namespace SingleFileZip
 {
     /// <summary>
-    /// Iterate though all 1st level folders in source-folder-location
-    /// Get year from folder's last write time, create folder with this year and move all similar folders into this folder
-    /// Compress all newly created folders
-    /// Only skip folders created in current year
+    /// Iterate though all files that match ZipFilePattern in folder SourceLocation
+    /// and were created before SourceLocation days
+    /// Put file into `temp` folder and zip it, after zipping move it into another folder `zippedFiles`
+    /// When all files (one-by-one) will be zipped - `temp` folder should be remove automatically
+    /// and `zippedFiles` folder should be removed manually
     /// </summary>
     internal class Program
     {
@@ -33,13 +34,13 @@ namespace SingleFileZip
                 .FullName;
             _tempDirInfo = new DirectoryInfo(_tempFolder);
 
-            var stopwatch = ZipFiles();
-            Console.WriteLine($"{stopwatch.Elapsed} | Done!");
+            ZipFiles();
+            Console.WriteLine($"{_stopwatch.Elapsed} | Done!");
             Console.ReadLine();
         }
 
 
-        private static Stopwatch ZipFiles()
+        private static void ZipFiles()
         {
             _stopwatch = Stopwatch.StartNew();
             DateTime now = DateTime.Now;
@@ -60,7 +61,6 @@ namespace SingleFileZip
             }
 
             RemoveTempFolder();
-            return _stopwatch;
         } 
 
         private static void ArchiveFile(string zipFile)
