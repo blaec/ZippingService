@@ -15,18 +15,46 @@ namespace ZippingService
     /// </summary>
     internal class Program
     {
-        private const bool IsZipFolders = false;
-        private const string SourceLocation = @"C:\runtime\httpd-2.4-x64\logs\";
+        private const bool IsZipFolders = true;
+        private const string SourceLocation = @"C:\terminalCheck\logs\";
         private static readonly int CurrentYear = DateTime.Today.Year;
         private const int NoZipPeriodInDays = 180;
 
         public static void Main(string[] args)
         {
-            var stopwatch = IsZipFolders 
-                ? ZipFolders() 
-                : ZipFiles();
+            // var stopwatch = IsZipFolders 
+            //     ? ZipFolders() 
+            //     : ZipFiles();
+            var stopwatch = ZipFilesInFolder();
             Console.WriteLine($"{stopwatch.Elapsed} | Done!");
             Console.ReadLine();
+        }
+
+        private static Stopwatch ZipFilesInFolder()
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+            HashSet<int> years = new HashSet<int>();
+            string[] zipFiles = Directory.GetFiles(SourceLocation, "*.log", SearchOption.TopDirectoryOnly);
+            foreach (var zipFile in zipFiles)
+            {
+                FileInfo file = new FileInfo(zipFile);
+                var year = file.LastWriteTime.Year;
+                if (CurrentYear == year) continue;
+
+                years.Add(year);
+                var destination = $"{SourceLocation}{year}{Path.DirectorySeparatorChar}";
+                Directory.CreateDirectory(destination);
+                File.Move(zipFile, $"{destination}{Path.GetFileName(zipFile)}");
+            }
+
+            foreach (var archive in years.Select(year => $"{SourceLocation}{year}"))
+            {
+                Console.WriteLine($"{stopwatch.Elapsed} | Compressing folder: {archive}...");
+                ZipFile.CreateFromDirectory(archive, $"{archive}.zip");
+                Console.WriteLine($"{stopwatch.Elapsed} | New zip file: {archive}.zip created.");
+            }
+
+            return stopwatch;
         }
 
         private static Stopwatch ZipFolders()
