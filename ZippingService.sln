@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SingleFileZip", "SingleFile
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleFilesZip", "MultipleFilesZip\MultipleFilesZip.csproj", "{1AFB003E-8F8F-4AE5-ADC1-A677D66B7D10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultipleFoldersZip", "MultipleFoldersZip\MultipleFoldersZip.csproj", "{6AC7B587-E7CE-4D0B-B947-6BC75E5106EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{1AFB003E-8F8F-4AE5-ADC1-A677D66B7D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1AFB003E-8F8F-4AE5-ADC1-A677D66B7D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1AFB003E-8F8F-4AE5-ADC1-A677D66B7D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AC7B587-E7CE-4D0B-B947-6BC75E5106EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AC7B587-E7CE-4D0B-B947-6BC75E5106EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AC7B587-E7CE-4D0B-B947-6BC75E5106EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AC7B587-E7CE-4D0B-B947-6BC75E5106EC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
